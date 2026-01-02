@@ -1,0 +1,444 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:ChatWithLLM.ViewModels"
+        xmlns:md="clr-namespace:Markdown.Avalonia;assembly=Markdown.Avalonia"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="700"
+        x:Class="ChatWithLLM.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="ChatWithLLM"
+        Background="{StaticResource BackgroundDarkBrush}"
+        Foreground="{StaticResource TextPrimaryBrush}">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto">
+
+        <!-- ══════════════════ HEADER ══════════════════ -->
+        <Border Grid.Row="0"
+                BorderThickness="0,0,0,1"
+                BorderBrush="{StaticResource BorderDarkBrush}"
+                Background="{StaticResource BackgroundDarkBrush}"
+                Padding="24,16">
+            <Grid ColumnDefinitions="*,Auto">
+                <!-- Sol: Başlık + Online -->
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Gemini Chat"
+                               FontSize="20"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource TextPrimaryBrush}"/>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Ellipse Width="8" Height="8" Fill="{StaticResource GreenOnlineBrush}"/>
+                        <TextBlock Text="Online"
+                                   FontSize="12"
+                                   Foreground="{StaticResource TextSecondaryBrush}"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Sağ: Settings + Avatar -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
+                    <Button Background="Transparent"
+                            BorderThickness="0"
+                            Padding="8"
+                            Cursor="Hand"
+                            Command="{Binding ToggleSettingsCommand}">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="⚙" FontSize="16" VerticalAlignment="Center"/>
+                            <TextBlock Text="Settings"
+                                       FontSize="14"
+                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Border Width="40" Height="40" CornerRadius="20"
+                            Background="{StaticResource GeminiAvatarGradient}"
+                            Cursor="Hand">
+                        <TextBlock Text="U"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   FontWeight="Bold"
+                                   FontSize="16"
+                                   Foreground="White"/>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ══════════════════ SETTINGS PANEL ══════════════════ -->
+        <Border Grid.Row="1"
+                IsVisible="{Binding IsSettingsOpen}"
+                BorderThickness="0,0,0,1"
+                BorderBrush="{StaticResource BorderDarkBrush}"
+                Background="{StaticResource ApiBarBgBrush}"
+                Padding="24,20"
+                ZIndex="100">
+            <StackPanel HorizontalAlignment="Center" MaxWidth="600" Spacing="20">
+                <TextBlock Text="⚙ SETTINGS"
+                           FontSize="14"
+                           FontWeight="Bold"
+                           Foreground="{StaticResource TextPrimaryBrush}"
+                           HorizontalAlignment="Center"/>
+
+                <!-- Model Selection -->
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Model"
+                               FontSize="12"
+                               Foreground="{StaticResource TextSecondaryBrush}"/>
+                    <ComboBox ItemsSource="{Binding AvailableModels}"
+                              SelectedItem="{Binding SelectedModel}"
+                              Background="{StaticResource SurfaceDarkBrush}"
+                              Foreground="{StaticResource TextPrimaryBrush}"
+                              MinWidth="300"
+                              HorizontalAlignment="Stretch"/>
+                </StackPanel>
+
+                <!-- Temperature Slider -->
+                <StackPanel Spacing="8">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Text="Yaratıcılık (Temperature)"
+                                   FontSize="12"
+                                   Foreground="{StaticResource TextSecondaryBrush}"/>
+                        <TextBlock Grid.Column="1"
+                                   Text="{Binding Temperature, StringFormat={}{0:F2}}"
+                                   FontSize="12"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource PrimaryBlueBrush}"/>
+                    </Grid>
+                    <Slider Minimum="0"
+                            Maximum="2"
+                            Value="{Binding Temperature}"
+                            TickFrequency="0.1"
+                            IsSnapToTickEnabled="True"
+                            Foreground="{StaticResource PrimaryBlueBrush}"/>
+                    <Grid ColumnDefinitions="*,*,*">
+                        <TextBlock Text="Tutarlı" FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Left"/>
+                        <TextBlock Grid.Column="1" Text="Dengeli" FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
+                        <TextBlock Grid.Column="2" Text="Yaratıcı" FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Right"/>
+                    </Grid>
+                </StackPanel>
+
+                <!-- Max Tokens -->
+                <StackPanel Spacing="8">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Text="Maksimum Çıktı (Token)"
+                                   FontSize="12"
+                                   Foreground="{StaticResource TextSecondaryBrush}"/>
+                        <TextBlock Grid.Column="1"
+                                   Text="{Binding MaxOutputTokens}"
+                                   FontSize="12"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource PrimaryBlueBrush}"/>
+                    </Grid>
+                    <Slider Minimum="256"
+                            Maximum="8192"
+                            Value="{Binding MaxOutputTokens}"
+                            TickFrequency="256"
+                            IsSnapToTickEnabled="True"
+                            Foreground="{StaticResource PrimaryBlueBrush}"/>
+                    <Grid ColumnDefinitions="*,*,*">
+                        <TextBlock Text="Kısa" FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Left"/>
+                        <TextBlock Grid.Column="1" Text="Orta" FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
+                        <TextBlock Grid.Column="2" Text="Uzun" FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Right"/>
+                    </Grid>
+                </StackPanel>
+
+                <!-- Buttons -->
+                <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center">
+                    <Button Command="{Binding ToggleSettingsCommand}"
+                            Background="Transparent"
+                            BorderBrush="{StaticResource BorderDarkBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="20,10"
+                            Cursor="Hand">
+                        <TextBlock Text="İptal" Foreground="{StaticResource TextSecondaryBrush}"/>
+                    </Button>
+                    <Button Command="{Binding SaveSettingsCommand}"
+                            Background="{StaticResource PrimaryBlueBrush}"
+                            Foreground="White"
+                            FontWeight="Bold"
+                            CornerRadius="8"
+                            Padding="20,10"
+                            Cursor="Hand">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="💾"/>
+                            <TextBlock Text="Kaydet"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- ══════════════════ API KEY BAR ══════════════════ -->
+        <Border Grid.Row="1"
+                IsVisible="{Binding !IsSettingsOpen}"
+                BorderThickness="0,0,0,1"
+                BorderBrush="{StaticResource BorderDarkBrush}"
+                Background="{StaticResource ApiBarBgBrush}"
+                Padding="24,16">
+            <StackPanel HorizontalAlignment="Center" MaxWidth="800" Spacing="8">
+                <TextBlock Text="GEMINI API KEY"
+                           FontSize="11"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           LetterSpacing="1"/>
+
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                    <Border Grid.Column="0"
+                            Background="{StaticResource SurfaceDarkBrush}"
+                            BorderBrush="{StaticResource BorderDarkBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="12,0">
+                        <Grid ColumnDefinitions="Auto,*">
+                            <TextBlock Text="🔑"
+                                       FontSize="16"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,10,0"
+                                       Opacity="0.6"/>
+                            <TextBox Grid.Column="1"
+                                     Text="{Binding ApiKey, Mode=TwoWay}"
+                                     PasswordChar="•"
+                                     Watermark="sk-..."
+                                     Background="Transparent"
+                                     BorderThickness="0"
+                                     Foreground="{StaticResource TextPrimaryBrush}"
+                                     VerticalAlignment="Center"
+                                     MinHeight="40"/>
+                        </Grid>
+                    </Border>
+
+                    <Button Grid.Column="1"
+                            Command="{Binding SaveKeyCommand}"
+                            Background="{StaticResource PrimaryBlueBrush}"
+                            Foreground="White"
+                            FontWeight="Bold"
+                            CornerRadius="8"
+                            Padding="20,12"
+                            Cursor="Hand">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="💾" FontSize="14"/>
+                            <TextBlock Text="Save Key" FontSize="14"/>
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <!-- ══════════════════ CHAT AREA ══════════════════ -->
+        <ScrollViewer Grid.Row="2"
+                      VerticalScrollBarVisibility="Auto"
+                      Background="{StaticResource SurfaceDarkBrush}">
+            <StackPanel Margin="24,24" HorizontalAlignment="Stretch">
+
+                <!-- Today badge -->
+                <Border HorizontalAlignment="Center"
+                        Background="{StaticResource SurfaceDarkBrush}"
+                        BorderBrush="{StaticResource BorderDarkBrush}"
+                        BorderThickness="1"
+                        CornerRadius="12"
+                        Padding="16,6"
+                        Margin="0,0,0,24">
+                    <TextBlock Text="Today"
+                               FontSize="12"
+                               Foreground="{StaticResource TextSecondaryBrush}"/>
+                </Border>
+
+                <ItemsControl ItemsSource="{Binding Messages}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Spacing="24"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+
+                    <ItemsControl.DataTemplates>
+
+                        <!-- ════ MODEL MESSAGE ════ -->
+                        <DataTemplate DataType="vm:ModelChatMessageItem">
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="16">
+                                <!-- Avatar -->
+                                <Border Width="40" Height="40" CornerRadius="20"
+                                        Background="{StaticResource GeminiAvatarGradient}"
+                                        VerticalAlignment="Top">
+                                    <TextBlock Text="✦"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               FontSize="18"
+                                               Foreground="White"/>
+                                </Border>
+
+                                <StackPanel Grid.Column="1" Spacing="8">
+                                    <!-- Name + Time -->
+                                    <StackPanel Orientation="Horizontal" Spacing="10">
+                                        <TextBlock Text="{Binding DisplayName}"
+                                                   FontWeight="Bold"
+                                                   FontSize="14"
+                                                   Foreground="{StaticResource TextPrimaryBrush}"/>
+                                        <TextBlock Text="{Binding TimestampText}"
+                                                   FontSize="12"
+                                                   Foreground="{StaticResource TextSecondaryBrush}"/>
+                                    </StackPanel>
+
+                                    <!-- Bubble -->
+                                    <Border Background="{StaticResource SurfaceDarkBrush}"
+                                            BorderBrush="{StaticResource BorderDarkBrush}"
+                                            BorderThickness="1"
+                                            CornerRadius="0,16,16,16"
+                                            Padding="20">
+                                        <md:MarkdownScrollViewer Markdown="{Binding Text}"/>
+                                    </Border>
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+
+                        <!-- ════ USER MESSAGE ════ -->
+                        <DataTemplate DataType="vm:UserChatMessageItem">
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                                <StackPanel Grid.Column="0" Spacing="8" HorizontalAlignment="Right">
+                                    <!-- Time + Name -->
+                                    <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
+                                        <TextBlock Text="{Binding TimestampText}"
+                                                   FontSize="12"
+                                                   Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <TextBlock Text="{Binding DisplayName}"
+                                                   FontWeight="Bold"
+                                                   FontSize="14"
+                                                   Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    </StackPanel>
+
+                                    <!-- Bubble -->
+                                    <Border Background="{StaticResource PrimaryBlueBrush}"
+                                            CornerRadius="16,0,16,16"
+                                            Padding="20">
+                                        <md:MarkdownScrollViewer Markdown="{Binding Text}"/>
+                                    </Border>
+                                </StackPanel>
+
+                                <!-- Avatar -->
+                                <Border Grid.Column="1" Width="40" Height="40" CornerRadius="20"
+                                        Background="{StaticResource GeminiAvatarGradient}"
+                                        VerticalAlignment="Top">
+                                    <TextBlock Text="Y"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               FontWeight="Bold"
+                                               FontSize="16"
+                                               Foreground="White"/>
+                                </Border>
+                            </Grid>
+                        </DataTemplate>
+
+                    </ItemsControl.DataTemplates>
+                </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- ══════════════════ COMPOSER ══════════════════ -->
+        <Border Grid.Row="3"
+                BorderThickness="0,1,0,0"
+                BorderBrush="{StaticResource BorderDarkBrush}"
+                Background="{StaticResource BackgroundDarkBrush}"
+                Padding="24,16">
+            <StackPanel HorizontalAlignment="Stretch" Spacing="12" Margin="24,0">
+
+                <!-- Typing indicator -->
+                <TextBlock Text="{Binding TypingText}"
+                           IsVisible="{Binding IsBusy}"
+                           FontSize="13"
+                           Foreground="{StaticResource TextSecondaryBrush}"/>
+
+                <!-- Error -->
+                <TextBlock Text="{Binding ErrorText}"
+                           IsVisible="{Binding HasError}"
+                           TextWrapping="Wrap"
+                           Foreground="#ef4444"/>
+
+                <!-- Attached file indicator -->
+                <Border IsVisible="{Binding HasAttachment}"
+                        Background="{StaticResource SurfaceDarkBrush}"
+                        BorderBrush="{StaticResource PrimaryBlueBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="12,8">
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                        <TextBlock Text="📎" FontSize="16" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="1"
+                                   Text="{Binding AttachedFileName}"
+                                   FontSize="13"
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   VerticalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis"/>
+                        <Button Grid.Column="2"
+                                Command="{Binding RemoveAttachmentCommand}"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Padding="4"
+                                Cursor="Hand">
+                            <TextBlock Text="✕" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}"/>
+                        </Button>
+                    </Grid>
+                </Border>
+
+                <!-- Input row -->
+                <Border Background="{StaticResource SurfaceDarkBrush}"
+                        BorderBrush="{StaticResource BorderDarkBrush}"
+                        BorderThickness="1"
+                        CornerRadius="12"
+                        Padding="8">
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                        <!-- Attach button -->
+                        <Button Grid.Column="0"
+                                Command="{Binding AttachFileCommand}"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Padding="8"
+                                VerticalAlignment="Bottom"
+                                Cursor="Hand"
+                                ToolTip.Tip="Dosya Ekle">
+                            <TextBlock Text="📎" FontSize="18" Opacity="0.6"/>
+                        </Button>
+
+                        <!-- TextBox -->
+                        <TextBox Grid.Column="1"
+                                 Text="{Binding UserInput, Mode=TwoWay}"
+                                 Watermark="Mesajını yaz..."
+                                 AcceptsReturn="True"
+                                 TextWrapping="Wrap"
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 Foreground="{StaticResource TextPrimaryBrush}"
+                                 MinHeight="44"
+                                 MaxHeight="120"
+                                 VerticalAlignment="Center"/>
+
+                        <!-- Send button -->
+                        <Button Grid.Column="2"
+                                Command="{Binding SendCommand}"
+                                Background="{StaticResource PrimaryBlueBrush}"
+                                Foreground="White"
+                                CornerRadius="8"
+                                Padding="12"
+                                VerticalAlignment="Bottom"
+                                Cursor="Hand"
+                                ToolTip.Tip="Gönder">
+                            <TextBlock Text="➤" FontSize="16"/>
+                        </Button>
+                    </Grid>
+                </Border>
+
+                <!-- Footer text -->
+                <TextBlock Text="AI can make mistakes. Consider checking important information."
+                           FontSize="10"
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           HorizontalAlignment="Center"
+                           Opacity="0.7"/>
+            </StackPanel>
+        </Border>
+
+    </Grid>
+</Window>

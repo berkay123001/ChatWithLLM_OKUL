@@ -1,0 +1,73 @@
+# Build outputs
+bin/
+obj/
+out/
+
+# IDE
+.idea/
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+.vscode/
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Rider
+.idea/
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+*~
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+!packages/build/
+
+# Logs
+*.log
+logs/
+
+# Test results
+TestResults/
+
+# User settings and secrets
+appsettings.*.json
+!appsettings.json
+secrets.json
+*.pfx
+*.p12
+
+# Application data (contains API keys!)
+settings.json
+chat_session.json
+
+# Publish output
+publish/
+
+# JetBrains Rider
+*.sln.iml

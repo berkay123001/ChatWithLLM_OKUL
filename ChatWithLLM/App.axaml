@@ -1,0 +1,40 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="ChatWithLLM.App"
+             xmlns:local="using:ChatWithLLM"
+             RequestedThemeVariant="Dark">
+
+    <Application.DataTemplates>
+        <local:ViewLocator/>
+    </Application.DataTemplates>
+  
+    <Application.Styles>
+        <FluentTheme />
+    </Application.Styles>
+
+    <Application.Resources>
+        <!-- HTML tasarımındaki renkler -->
+        <Color x:Key="PrimaryBlue">#2b6cee</Color>
+        <Color x:Key="BackgroundDark">#101622</Color>
+        <Color x:Key="SurfaceDark">#1c1f27</Color>
+        <Color x:Key="BorderDark">#282e39</Color>
+        <Color x:Key="ApiBarBg">#151a25</Color>
+        <Color x:Key="GreenOnline">#22c55e</Color>
+        <Color x:Key="TextPrimary">#ffffff</Color>
+        <Color x:Key="TextSecondary">#94a3b8</Color>
+
+        <SolidColorBrush x:Key="PrimaryBlueBrush" Color="{StaticResource PrimaryBlue}"/>
+        <SolidColorBrush x:Key="BackgroundDarkBrush" Color="{StaticResource BackgroundDark}"/>
+        <SolidColorBrush x:Key="SurfaceDarkBrush" Color="{StaticResource SurfaceDark}"/>
+        <SolidColorBrush x:Key="BorderDarkBrush" Color="{StaticResource BorderDark}"/>
+        <SolidColorBrush x:Key="ApiBarBgBrush" Color="{StaticResource ApiBarBg}"/>
+        <SolidColorBrush x:Key="GreenOnlineBrush" Color="{StaticResource GreenOnline}"/>
+        <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimary}"/>
+        <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondary}"/>
+
+        <LinearGradientBrush x:Key="GeminiAvatarGradient" StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Color="#3b82f6" Offset="0"/>
+            <GradientStop Color="#9333ea" Offset="1"/>
+        </LinearGradientBrush>
+    </Application.Resources>
+</Application>
