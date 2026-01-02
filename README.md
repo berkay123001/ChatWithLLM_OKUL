@@ -19,7 +19,7 @@ Modern ve şık bir Gemini AI sohbet uygulaması. Avalonia UI framework'ü ile C
 
 ## 📸 Ekran Görüntüsü
 
-![Chat Interface](Tasarım/stitch_llm_chat_interface/screen.png)
+![Chat Interface](image.png)
 
 ## 🚀 Kurulum
 
